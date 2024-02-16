@@ -16,7 +16,7 @@ function Header() {
       >
         <MenuIcon className="text-gray-700 text-2xl" />
       </Button>
-      <DescriptionIcon className="text-blue-700 text-4xl " />
+      <DescriptionIcon className="text-blue-600 text-4xl " />
       <h1 className="ml-2 text-gray-700 text-2xl">Docs</h1>
       <div className="flex flex-grow items-center m-4 px-5 py-2 bg-gray-100 text-grey-600 rounded-lg focus-within:text-gray-600 focus-within:shadow-md">
         <SearchIcon className="text-3xl text-gray-700" />

@@ -1,7 +1,7 @@
 "use client";
 
 import Header from "@/components/Header";
-
+import DocumentRow from "@/components/DocumentRow";
 import {
   ThemeProvider,
   Button,
@@ -15,21 +15,39 @@ import FolderIcon from "@mui/icons-material/Folder";
 import Image from "next/image";
 import { getSession, useSession } from "next-auth/react";
 import Login from "@/components/Login";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { db } from "@/firebase";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  serverTimestamp,
+  query,
+  orderBy,
+} from "firebase/firestore";
+import { useCollectionOnce } from "react-firebase-hooks/firestore";
 
 export default function Home() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [showModal, setShowModal] = useState(false);
   const [input, setInput] = useState("");
 
+  const [snapshot] = useCollectionOnce(
+    session?.user?.email
+      ? query(
+          collection(db, "userDocs", session.user.email, "docs"),
+          orderBy("timestamp", "desc")
+        )
+      : null
+  );
+  if (status === "loading") {
+    return <div>Loading...</div>;
+  }
   if (!session) return <Login />;
 
   const createDocument = async () => {
     if (!input) return;
     const userEmail = session.user.email;
-    console.log(userEmail);
+
     const userDocsCollectionRef = collection(db, "userDocs", userEmail, "docs");
 
     const docRef = await addDoc(userDocsCollectionRef, {
@@ -72,6 +90,7 @@ export default function Home() {
       </DialogFooter>
     </Dialog>
   );
+
   return (
     <div>
       <Header />
@@ -104,6 +123,14 @@ export default function Home() {
             <p className="mr-12">Date Created</p>
             <FolderIcon className="text-gray-600" />
           </div>
+          {snapshot?.docs.map((doc) => (
+            <DocumentRow
+              key={doc.id}
+              id={doc.id}
+              fileName={doc.data().fileName}
+              date={doc.data().timestamp}
+            />
+          ))}
         </div>
       </section>
     </div>
