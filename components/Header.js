@@ -34,6 +34,7 @@ function Header() {
       </Button>
       <Image
         src={session?.user?.image}
+        alt="icon"
         width={40}
         height={40}
         className="hidden md:inline-flex cursor-pointer rounded-full ml-2"

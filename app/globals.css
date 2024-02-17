@@ -31,3 +31,9 @@
     text-wrap: balance;
   }
 }
+
+@layer components {
+  .option {
+    @apply cursor-pointer hover:bg-gray-100 transition duration-200 ease-out p-2 rounded-lg;
+  }
+}
