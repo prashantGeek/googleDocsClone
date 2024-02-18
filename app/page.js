@@ -13,7 +13,7 @@ export { ThemeProvider, Button };
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import FolderIcon from "@mui/icons-material/Folder";
 import Image from "next/image";
-import { getSession, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import Login from "@/components/Login";
 import { useState, useEffect } from "react";
 import { db } from "@/firebase";
@@ -24,14 +24,15 @@ import {
   query,
   orderBy,
 } from "firebase/firestore";
-import { useCollectionOnce } from "react-firebase-hooks/firestore";
+import { useCollection } from "react-firebase-hooks/firestore";
+import LoadingSkeleton from "@/components/LoadingSkeleton";
 
 export default function Home() {
   const { data: session, status } = useSession();
   const [showModal, setShowModal] = useState(false);
   const [input, setInput] = useState("");
 
-  const [snapshot] = useCollectionOnce(
+  const [snapshot] = useCollection(
     session?.user?.email
       ? query(
           collection(db, "userDocs", session.user.email, "docs"),
@@ -39,8 +40,23 @@ export default function Home() {
         )
       : null
   );
+
+  const [documentRows, setDocumentRows] = useState([]);
+  useEffect(() => {
+    if (snapshot && snapshot.docs.length > 0) {
+      const documents = snapshot.docs.map((doc) => (
+        <DocumentRow
+          key={doc.id}
+          id={doc.id}
+          fileName={doc.data().fileName}
+          date={doc.data().timestamp}
+        />
+      ));
+      setDocumentRows(documents);
+    }
+  }, [snapshot]);
   if (status === "loading") {
-    return <div>Loading...</div>;
+    return <LoadingSkeleton />;
   }
   if (!session) return <Login />;
 
@@ -110,8 +126,10 @@ export default function Home() {
             >
               <Image
                 src="https://links.papareact.com/pju"
-                layout="fill"
+                width={800}
+                height={600}
                 alt="google"
+                priority={true}
               />
             </div>
             <p className="ml-2 mt-2 font-semibold text-sm text-gray-700">
@@ -127,23 +145,16 @@ export default function Home() {
             <p className="mr-12">Date Created</p>
             <FolderIcon className="text-gray-600" />
           </div>
-          {snapshot?.docs.map((doc) => (
-            <DocumentRow
-              key={doc.id}
-              id={doc.id}
-              fileName={doc.data().fileName}
-              date={doc.data().timestamp}
-            />
-          ))}
+          {documentRows}
         </div>
       </section>
     </div>
   );
 }
 
-export const GetServerSideProps = async () => {
-  const session = await getSession(context);
-  return {
-    props: { session },
-  };
-};
+// export const getServerSideProps = async () => {
+//   const session = await getSession(context);
+//   return {
+//     props: { session },
+//   };
+// };

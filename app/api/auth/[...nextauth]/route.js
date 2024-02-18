@@ -17,7 +17,6 @@ const handler = NextAuth({
       privateKey: process.env.FIREBASE_PRIVATE_KEY,
     }),
   }),
-  // ...
 });
 
 export { handler as GET, handler as POST };

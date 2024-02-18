@@ -1,6 +1,6 @@
 "use client";
-
-import { Editor } from "react-draft-wysiwyg";
+import dynamic from "next/dynamic";
+// import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { EditorState } from "draft-js";
 import { useEffect, useState } from "react";
@@ -10,6 +10,10 @@ import { convertToRaw, convertFromRaw } from "draft-js";
 import { useSession } from "next-auth/react";
 import { useDocumentOnce } from "react-firebase-hooks/firestore";
 
+const Editor = dynamic(
+  () => import("react-draft-wysiwyg").then((mod) => mod.Editor),
+  { ssr: false }
+);
 const TextEditor = (props) => {
   const { data: session } = useSession();
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
@@ -41,7 +45,6 @@ const TextEditor = (props) => {
       }
     );
   };
-  console.log(editorState);
   return (
     <div className="bg-[#F8F9FA] min-h-screen pb-16">
       <Editor

@@ -10,6 +10,7 @@ import { collection, doc } from "firebase/firestore";
 import PeopleIcon from "@mui/icons-material/People";
 import Image from "next/image";
 import TextEditor from "@/components/TextEditor";
+import LoadingSkeleton from "@/components/LoadingSkeleton";
 
 const page = ({ params }) => {
   const { data: session, status } = useSession();
@@ -20,6 +21,9 @@ const page = ({ params }) => {
       ? doc(collection(db, "userDocs", session?.user?.email, "docs"), id)
       : null
   );
+  if (status === "loading") {
+    return <LoadingSkeleton />;
+  }
   if (!loadingSnapshot && !snapshot?.data()?.fileName) {
     router.replace("/");
   }
@@ -61,6 +65,7 @@ const page = ({ params }) => {
           width={40}
           height={40}
           className="rounded-full ml-2 cursor-pointer"
+          onClick={() => signOut()}
         />
       </header>
       <TextEditor id={params.id} />
@@ -70,11 +75,11 @@ const page = ({ params }) => {
 
 export default page;
 
-export async function GetServerSideProps(context) {
-  const session = await getSession(context);
-  return {
-    props: {
-      session,
-    },
-  };
-}
+// export async function GetServerSideProps(context) {
+//   const session = await getSession(context);
+//   return {
+//     props: {
+//       session,
+//     },
+//   };
+// }
