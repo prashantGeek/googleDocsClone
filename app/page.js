@@ -43,7 +43,7 @@ export default function Home() {
 
   const [documentRows, setDocumentRows] = useState([]);
   useEffect(() => {
-    if (snapshot && snapshot.docs.length > 0) {
+    if (snapshot) {
       const documents = snapshot.docs.map((doc) => (
         <DocumentRow
           key={doc.id}
@@ -61,11 +61,12 @@ export default function Home() {
   if (!session) return <Login />;
 
   const createDocument = async () => {
-    if (!input) return;
+    if (!input) {
+      setShowModal(false);
+      return;
+    }
     const userEmail = session.user.email;
-
     const userDocsCollectionRef = collection(db, "userDocs", userEmail, "docs");
-
     const docRef = await addDoc(userDocsCollectionRef, {
       fileName: input,
       timestamp: serverTimestamp(),

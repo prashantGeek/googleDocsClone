@@ -5,6 +5,12 @@ import SearchIcon from "@mui/icons-material/Search";
 import AppsIcon from "@mui/icons-material/Apps";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+} from "@nextui-org/react";
 
 function Header() {
   const { data: session } = useSession();
@@ -32,14 +38,22 @@ function Header() {
       >
         <AppsIcon className="m-2 text-gray-700 text-4xl" />
       </Button>
-      <Image
-        src={session?.user?.image}
-        alt="icon"
-        width={40}
-        height={40}
-        className="hidden md:inline-flex cursor-pointer rounded-full ml-2"
-        onClick={signOut}
-      />
+      <Dropdown>
+        <DropdownTrigger>
+          <Image
+            src={session?.user?.image}
+            alt="icon"
+            width={40}
+            height={40}
+            className="hidden md:inline-flex cursor-pointer rounded-full ml-2"
+          />
+        </DropdownTrigger>
+        <DropdownMenu aria-label="Static Actions">
+          <DropdownItem key="new" onClick={() => signOut()}>
+            Sign Out
+          </DropdownItem>
+        </DropdownMenu>
+      </Dropdown>
     </header>
   );
 }

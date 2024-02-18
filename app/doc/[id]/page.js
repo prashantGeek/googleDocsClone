@@ -2,8 +2,8 @@
 import { Button } from "@material-tailwind/react";
 import { useRouter } from "next/navigation";
 import { db } from "@/firebase";
-import { useDocumentOnce } from "react-firebase-hooks/firestore";
-import { useSession, getSession, signOut } from "next-auth/react";
+import { useDocument } from "react-firebase-hooks/firestore";
+import { useSession, signOut } from "next-auth/react";
 import Login from "@/components/Login";
 import DescriptionIcon from "@mui/icons-material/Description";
 import { collection, doc } from "firebase/firestore";
@@ -11,12 +11,18 @@ import PeopleIcon from "@mui/icons-material/People";
 import Image from "next/image";
 import TextEditor from "@/components/TextEditor";
 import LoadingSkeleton from "@/components/LoadingSkeleton";
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+} from "@nextui-org/react";
 
 const page = ({ params }) => {
   const { data: session, status } = useSession();
   const router = useRouter();
   const id = params.id;
-  const [snapshot, loadingSnapshot] = useDocumentOnce(
+  const [snapshot, loading] = useDocument(
     session?.user?.email
       ? doc(collection(db, "userDocs", session?.user?.email, "docs"), id)
       : null
@@ -24,7 +30,7 @@ const page = ({ params }) => {
   if (status === "loading") {
     return <LoadingSkeleton />;
   }
-  if (!loadingSnapshot && !snapshot?.data()?.fileName) {
+  if (!loading && !snapshot?.data()?.fileName) {
     router.replace("/");
   }
   if (!session) return <Login />;
@@ -52,21 +58,29 @@ const page = ({ params }) => {
         <Button
           color="light-blue"
           variant="filled"
-          size="regular"
+          size="md"
           className="hidden md:!inline-flex h-10 items-center"
-          rounded={false}
-          block={false}
         >
           <PeopleIcon fontSize="medium" />
           <span className="ml-1">Share</span>
         </Button>
-        <Image
-          src={session.user.image}
-          width={40}
-          height={40}
-          className="rounded-full ml-2 cursor-pointer"
-          onClick={() => signOut()}
-        />
+        <Dropdown>
+          <DropdownTrigger>
+            <Image
+              src={session.user.image}
+              width={40}
+              height={40}
+              alt="profile"
+              className="rounded-full ml-2 cursor-pointer"
+              priority={true}
+            />
+          </DropdownTrigger>
+          <DropdownMenu aria-label="Static Actions">
+            <DropdownItem key="new" onClick={() => signOut()}>
+              Sign Out
+            </DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
       </header>
       <TextEditor id={params.id} />
     </div>
