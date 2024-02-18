@@ -1,16 +1,19 @@
-const LoadingSkeleton = () => {
+"use client";
+import { css } from "@emotion/react";
+import { SyncLoader } from "react-spinners";
+
+const override = css`
+  display: block;
+  margin: 0 auto;
+  border-color: red;
+`;
+
+function LoadingSkeleton() {
   return (
-    <div className="loading-skeleton bg-gray-200 p-4 rounded-lg shadow-md">
-      {/* Header skeleton */}
-      <div className="header-skeleton h-12 bg-gray-300 mb-4 rounded-md"></div>
-
-      {/* Modal skeleton */}
-      <div className="modal-skeleton h-40 bg-gray-300 mb-4 rounded-md"></div>
-
-      {/* Main content skeleton */}
-      <div className="main-content-skeleton h-64 bg-gray-300 rounded-md"></div>
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <SyncLoader color="#0096FF" loading={true} css={override} size={15} />
     </div>
   );
-};
+}
 
 export default LoadingSkeleton;
